@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class UserController {
@@ -40,17 +40,21 @@ public class UserController {
         return "user";
     }
 
-    @DeleteMapping("/api/user/{userId}")
-    public User delete(@PathVariable String userId) {
-        if (userService.get(userId) == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found");
-        }
-        return userService.remove(userId);
+    @GetMapping("/users/new")
+    public String add() {
+        return "user-new";
     }
 
     @PostMapping("/users/new")
-    public User add(@RequestBody @Validated User user) {
-        return userService.save(user);
+    public String add(User user, RedirectAttributes redirectAttributes) {
+        try {
+            userService.save(user);
+            redirectAttributes.addFlashAttribute("message", "User Created Successfully");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("message", "User Creation Failed: " + e.getMessage());
+            return "redirect:/users/new";
+        }
+        return "redirect:/users/" + user.getUserId();
     }
 
 }

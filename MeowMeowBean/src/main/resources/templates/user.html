@@ -12,9 +12,9 @@
 <p th:text="'beans: ' + ${user.beans}"></p>
 <p th:text="'level: ' + ${user.level}"></p>
 <div th:each="post : ${user.posts}">
-    <p th:text="${post.title}">
-        <a th:href="@{/posts/{id}(id=${post.postId})}"></a>
-    </p>
+    <a th:href="@{/posts/{id}(id=${post.postId})}">
+        <p th:text="${post.title}"></p>
+    </a>
 </div>
 </div>
 </body>

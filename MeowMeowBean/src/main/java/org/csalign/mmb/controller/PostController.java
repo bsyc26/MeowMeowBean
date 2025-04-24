@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -44,31 +45,32 @@ public class PostController {
         return "post";
     }
 
-    @DeleteMapping("/posts/{postId}")
-    public Post remove(@PathVariable String postId) {
-        if (postService.get(postId) == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post Not Found");
-        }
-        return postService.remove(postId);
-    }
-
     @GetMapping("/posts/new")
-    public String add(Model model) {
-        model.addAttribute("post", new Post());
-        return "new-post";
+    public String add() {
+        return "post-new";
     }
 
     @PostMapping("/posts/new")
-    public Post add(@RequestBody @Validated Post post) {
-        return postService.save(post);
+    public String add(Post post, RedirectAttributes redirectAttributes) {
+        try {
+            postService.save(post);
+            redirectAttributes.addFlashAttribute("message", "Post Created Successfully");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("message", "Post Creation Failed: " + e.getMessage());
+            return "redirect:/posts/new";
+        }
+        return "redirect:/posts/" + post.getPostId();
     }
 
     @PostMapping("/posts/{postId}/rating")
-    public void rate(@PathVariable String postId, @RequestBody @Validated Rating rating) {
-        if (postService.get(postId) == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post Not Found");
+    public String rate(@PathVariable String postId, Rating rating, RedirectAttributes redirectAttributes) {
+        try {
+            postService.rate(postId, rating);
+            redirectAttributes.addFlashAttribute("message", "Post Rated Successfully");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("message", "Post Rating Failed: " + e.getMessage());
         }
-        postService.rate(postId, rating);
+        return "redirect:/posts/" + postId;
     }
 
 }
