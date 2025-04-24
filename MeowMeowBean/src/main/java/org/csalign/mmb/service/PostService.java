@@ -23,7 +23,7 @@ public class PostService {
         put("1", new Post("1", "The Level 1's Post", "Example Content", "1"));
     }};
 
-    public Iterable<Post> get() {
+    public List<Post> get() {
         List<Post> posts = new ArrayList<>(postDB.values());
         Collections.sort(posts);
         return posts;
