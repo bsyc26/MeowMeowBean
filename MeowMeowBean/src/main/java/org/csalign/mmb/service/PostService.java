@@ -34,6 +34,9 @@ public class PostService {
     }
 
     public Post save(Post post) {
+        if (userService.get(post.getUserId()) == null) {
+            throw new IllegalArgumentException("User Not Found");
+        }
         post.setPostId(UUID.randomUUID().toString());
         postDB.put(post.getPostId(), post);
         userService.get(post.getUserId()).addPost(post);
@@ -48,7 +51,13 @@ public class PostService {
 
     public void rate(String postId, Rating rating) {
         Post post = postDB.get(postId);
+        if (post == null) {
+            throw new IllegalArgumentException("Post Not Found");
+        }
         int beans = userService.castBeans(rating.getUserId(), rating.getRating());
+        if (beans == 0) {
+            throw new IllegalArgumentException("Not Enough Beans: " + rating.getRating() + " for User");
+        }
         post.takeBeans(beans);
         userService.takeBeans(post.getUserId(), beans);
     }

@@ -37,7 +37,7 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found");
         }
         mode.addAttribute("user", user);
-        return "user";
+        return "user-detail";
     }
 
     @GetMapping("/users/new")

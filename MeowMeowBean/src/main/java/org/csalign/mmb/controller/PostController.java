@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -42,7 +41,7 @@ public class PostController {
         }
         model.addAttribute("post", post);
         model.addAttribute("author", post.getUserId());
-        return "post";
+        return "post-detail";
     }
 
     @GetMapping("/posts/new")
@@ -63,13 +62,14 @@ public class PostController {
     }
 
     @PostMapping("/posts/{postId}/rating")
-    public String rate(@PathVariable String postId, Rating rating, RedirectAttributes redirectAttributes) {
+    public String rate(Rating rating, RedirectAttributes redirectAttributes, @PathVariable String postId, Model model) {
         try {
             postService.rate(postId, rating);
             redirectAttributes.addFlashAttribute("message", "Post Rated Successfully");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("message", "Post Rating Failed: " + e.getMessage());
         }
+        model.addAttribute("postId", postId);
         return "redirect:/posts/" + postId;
     }
 
